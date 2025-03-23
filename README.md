@@ -11,6 +11,6 @@ Real-Time Translation: Converts Morse code into English text and speech.
 
 User-Friendly Interface: A web-based UI for accessibility and ease of use.
 
-Django REST Framework (DRF): Backend authentication and API handling (integration in progress).
+Django REST Framework (DRF): Backend authentication and API handling.
 
 This project aims to provide an alternative communication method for individuals with motor disabilities, ensuring ease of use across all age groups.
