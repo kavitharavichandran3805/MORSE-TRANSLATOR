@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './Sample.css';
@@ -340,5 +341,18 @@ export default function Both() {
     </Router>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
