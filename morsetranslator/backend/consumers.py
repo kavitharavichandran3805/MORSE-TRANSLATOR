@@ -12,7 +12,7 @@ import time
 LEFT_EYE = [36, 37, 38, 39, 40, 41]
 RIGHT_EYE = [42, 43, 44, 45, 46, 47]
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(r"C:\Users\Dell\Desktop\DESKTOP_FOLDER\MORSE CODE\morseenv\shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor(r"D:\MORSE-TRANSLATOR\shape_predictor_68_face_landmarks.dat")
 threshold = 0.22
 blink_threshold = 0.3
 letter_space_threshold = 0.8

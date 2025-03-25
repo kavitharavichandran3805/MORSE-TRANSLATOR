@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Screen.css";
@@ -7,6 +8,7 @@ const Screen = () => {
   const [socket, setSocket] = useState(null);
   const [translatedText, setTranslatedText] = useState("");
   const [frame, setFrame] = useState("");
+  const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,8 +66,29 @@ const Screen = () => {
     navigate('/');
   };
 
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      // Add any additional logout logic here (e.g., clearing tokens)
+      navigate('/');
+    }
+    setShowLogout(false);
+  };
+
+  const handleCircleClick = () => {
+    setShowLogout(!showLogout);
+  };
+
   return (
     <div className="containerScreen">
+      <div className="logout-circle" onClick={handleCircleClick}>
+        U
+        {showLogout && (
+          <div className="logout-dropdown">
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
+      </div>
       <button className="back-button" onClick={handleBack}>Back</button>
       <div className="instructions">
         <h2>Morse Translator</h2>
@@ -95,6 +118,5 @@ const Screen = () => {
     </div>
   );
 };
-
 
 export default Screen;
