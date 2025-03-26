@@ -1,7 +1,73 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Screen.css";
+
+const getcsrf = async (endpoint, method) => {
+  try {
+    const url = `http://127.0.0.1:8000/api/${endpoint}/`;
+    const options = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include"
+    }
+
+    const response = await fetch(url, options);
+    if (response.ok) {
+      const result = await response.json();
+      return result.token;
+    }
+  }
+  catch (error) {
+    console.error("Error fetching CSRF token:", error);
+    return null;
+  }
+}
+
+const apiCall = async (endpoint, method, body = null, token = null) => {
+  try {
+    const url = `http://127.0.0.1:8000/api/${endpoint}/`;
+    const csrftoken = await getcsrf("csrf", "GET");
+
+    console.log("Cookies before request:", document.cookie);
+
+    const options = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      credentials: "include"
+    };
+
+    if (token) {
+      options.headers['Authorization'] = `Bearer ${token}`
+    }
+
+    if (body !== null) {
+      console.log("Request Body:", body);
+      options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, options);
+    console.log("Response cookies:", response.headers.get('set-cookie'));
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Result:", JSON.stringify(result, null, 2));
+      return result;
+    }
+    else {
+      return { status: false, error: `Error: ${response.statusText}` };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { status: false, error: error.message };
+  }
+}
+
 
 const Screen = () => {
   const [isBlack, setIsBlack] = useState(false);
@@ -66,11 +132,25 @@ const Screen = () => {
     navigate('/');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const confirmLogout = window.confirm("Are you sure you want to logout?");
-    if (confirmLogout) {
-      // Add any additional logout logic here (e.g., clearing tokens)
-      navigate('/');
+    try {
+      if (confirmLogout) {
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        console.log(accessToken)
+        const result = await apiCall("logout", "POST", { refresh: refreshToken }, accessToken)
+        if (result.status) {
+          navigate('/');
+        }
+        else {
+          alert("Failed to logout")
+        }
+
+      }
+    }
+    catch (error) {
+      alert("Error in logging out!!!")
     }
     setShowLogout(false);
   };

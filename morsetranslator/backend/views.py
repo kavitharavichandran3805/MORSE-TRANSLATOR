@@ -25,9 +25,9 @@ def get_tokens_for_user(user):
 class LogoutAPI(APIView):
 
     permission_classes=[IsAuthenticated]
-
     def post(self,request):
         try:
+            print("inside the logout api")
             refresh_token = request.data.get("refresh")
             token = RefreshToken(refresh_token)
             token.blacklist()
