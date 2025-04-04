@@ -67,15 +67,15 @@ class MorseConsumer(AsyncWebsocketConsumer):
     async def translate(self):
         self.letters = ""
         self.current_word = ""
-        
+
         while self.running:
             ret, frame = self.cap.read()
             if not ret:
                 break
-            
+
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = detector(gray)
-            
+
             should_send_update = False
             new_letter = None
 
@@ -83,7 +83,7 @@ class MorseConsumer(AsyncWebsocketConsumer):
                 landmark = predictor(gray, face)
                 left_eye = np.array([(landmark.part(n).x, landmark.part(n).y) for n in LEFT_EYE])
                 right_eye = np.array([(landmark.part(n).x, landmark.part(n).y) for n in RIGHT_EYE])
-                
+
                 left_ear = self.calculate_ear(left_eye)
                 right_ear = self.calculate_ear(right_eye)
                 avg_ear = (left_ear + right_ear) / 2
@@ -96,7 +96,7 @@ class MorseConsumer(AsyncWebsocketConsumer):
                     if self.eye_closed:
                         blink_duration = time.time() - self.blink_start
                         self.eye_closed = False
-                        self.eye_open_start = time.time()  
+                        self.eye_open_start = time.time()
 
                         if blink_duration < blink_threshold:
                             self.letters += '.'
@@ -106,16 +106,16 @@ class MorseConsumer(AsyncWebsocketConsumer):
             eye_open_duration = time.time() - self.eye_open_start
 
             if eye_open_duration > letter_space_threshold and self.letters:
-                for character, code in MORSE_CODE_DICT.items(): 
+                for character, code in MORSE_CODE_DICT.items():
                     if code == self.letters:
                         self.current_word += character
-                        new_letter = character
+                        new_letter = character  
                         should_send_update = True
                         print(character, end='', flush=True)
                         break
-                self.letters = ''
+                self.letters = '' 
 
-            if eye_open_duration > word_space_threshold and self.current_word:
+            if eye_open_duration > word_space_threshold and self.current_word and self.current_word[-1] != " ":
                 print(" ", end='', flush=True)
                 self.current_word += " "
                 should_send_update = True
@@ -124,20 +124,23 @@ class MorseConsumer(AsyncWebsocketConsumer):
             frame_base64 = base64.b64encode(buffer).decode('utf-8')
 
             if self.running:
-                if should_send_update and self.current_word != self.last_sent_word:
+                if should_send_update:
                     update_data = {
-                        "translation": self.current_word if new_letter else " ",
+                        "translation": self.current_word.strip(),  
                         "frame": frame_base64,
                         "newLetter": True if new_letter else False
                     }
                     await self.send(text_data=json.dumps(update_data))
-                    self.last_sent_word = self.current_word
+                    self.last_sent_word = self.current_word.strip()
                 else:
                     await self.send(text_data=json.dumps({
                         "frame": frame_base64
                     }))
 
             await asyncio.sleep(0.1)
+
+
+
 
     def calculate_ear(self, eye_arr):
         dis1 = distance.euclidean(eye_arr[1], eye_arr[5])

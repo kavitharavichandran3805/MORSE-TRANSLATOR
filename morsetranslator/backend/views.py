@@ -29,6 +29,7 @@ class LogoutAPI(APIView):
         try:
             print("inside the logout api")
             refresh_token = request.data.get("refresh")
+            print("the refresh token is "+refresh_token)
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({"status": True, "message": "Logout successful"})
@@ -36,7 +37,14 @@ class LogoutAPI(APIView):
             return Response({"status": False, "message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
         
-
+class UserInitial(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        print("inside the userinitial api")
+        user=request.user
+        userinitial=user[0].upper()
+        print(user)
+        return Response({"status":True,"initial":userinitial})
 
 class SignupAPI(APIView):
 

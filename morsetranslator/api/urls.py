@@ -1,5 +1,5 @@
 from django.urls import path
-from backend.views import LoginAPI,UserDetailsAPI,SignupAPI,UserDetailsAPI,LogoutAPI,SampleSignupAPI,EmailAPI,get_csrf_token
+from backend.views import LoginAPI,UserDetailsAPI,SignupAPI,UserDetailsAPI,LogoutAPI,SampleSignupAPI,EmailAPI,get_csrf_token,UserInitial
 
 urlpatterns=[
     path('login/',LoginAPI.as_view()),
@@ -9,5 +9,6 @@ urlpatterns=[
     path('sampledelete/',SampleSignupAPI.as_view()),
     path('issue_email/',EmailAPI.as_view()),
     path('csrf/',get_csrf_token),
+    path('get_user_initial/',UserInitial.as_view())
     
 ]

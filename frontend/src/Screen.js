@@ -75,6 +75,7 @@ const Screen = () => {
   const [translatedText, setTranslatedText] = useState("");
   const [frame, setFrame] = useState("");
   const [showLogout, setShowLogout] = useState(false);
+  const [userInitial, setUserInitial] = useState("U");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -113,6 +114,19 @@ const Screen = () => {
     };
   }, []);
 
+  useEffect(() => {
+
+    const fetchInitial = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      const refreshToken = localStorage.getItem("refreshToken");
+      const result = await apiCall("get_user_initial", "POST", { refresh: refreshToken }, accessToken);
+      if (result.status && result.initial) {
+        setUserInitial(result.initial);
+      }
+    }
+    fetchInitial();
+  }, []);
+
   const handleStart = () => {
     if (socket) {
       socket.send(JSON.stringify({ "command": "start" }));
@@ -126,6 +140,8 @@ const Screen = () => {
       console.log("Sending stop command...");
       socket.send(JSON.stringify({ "command": "stop" }));
     }
+    setIsBlack(false);
+    setFrame("");
   };
 
   const handleBack = () => {
@@ -141,6 +157,8 @@ const Screen = () => {
         console.log(accessToken)
         const result = await apiCall("logout", "POST", { refresh: refreshToken }, accessToken)
         if (result.status) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           navigate('/');
         }
         else {
@@ -162,7 +180,7 @@ const Screen = () => {
   return (
     <div className="containerScreen">
       <div className="logout-circle" onClick={handleCircleClick}>
-        U
+        {userInitial}
         {showLogout && (
           <div className="logout-dropdown">
             <button onClick={handleLogout}>Logout</button>
@@ -187,11 +205,12 @@ const Screen = () => {
         <div className="right-section">
           <div className="section">
             <h3>Instructions</h3>
-            <p>Content goes here...</p>
+            {/* <p>Content goes here...</p> */}
+            <img src="/morse_guide/image.png" alt="Blinking Instructions" id="morse_guide"></img>
           </div>
           <div className="section">
             <h3>Translated Text</h3>
-            <textarea value={translatedText} placeholder="Enter text here..."></textarea>
+            <textarea value={translatedText} ></textarea>
           </div>
         </div>
       </div>

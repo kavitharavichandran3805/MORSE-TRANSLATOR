@@ -150,16 +150,6 @@ function HelpOverlay({ onClose }) {
       if (!token) {
         alert("Please log in to submit your issue 🔐😊")
         return;
-        // toast.warn("🔐 Please log in to submit your issue!", {
-        //   position: "top-center",
-        //   autoClose: 3000,
-        //   hideProgressBar: false,
-        //   closeOnClick: true,
-        //   pauseOnHover: true,
-        //   draggable: true,
-        //   progress: undefined,
-        // });
-        // return;
       }
       const result = await apiCall("issue_email", "POST", { issue }, token)
       if (result.status === true) {
