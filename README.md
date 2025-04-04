@@ -1,5 +1,5 @@
 # 2025-Morse-Translator
-Morse Translator - https://idea.unisys.com/D8006
+Morse Translator 
 =======
 Real-Time Morse Code Translator using Eye Blinks
 
